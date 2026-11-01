@@ -1,0 +1,47 @@
+{
+  "name": "omni-attack-lab",
+  "version": "1.0.0",
+  "description": "Omni-Attack-Lab — a local visual arena where an obfuscator (red) fights a static/AI deobfuscator (blue). Pure Node.js + vanilla DOM, Win7-safe, no WebGL.",
+  "type": "commonjs",
+  "main": "lab-server/server.js",
+  "bin": {
+    "omni-attack-lab": "lab-server/server.js"
+  },
+  "scripts": {
+    "start": "node lab-server/server.js",
+    "open": "node lab-server/server.js --open",
+    "headless": "node lab-server/server.js --no-open",
+    "test": "node tests/smoke.js",
+    "doctor": "node scripts/doctor.js",
+    "vendor": "node scripts/vendor-engines.js"
+  },
+  "files": [
+    "lab-ui/",
+    "lab-engine/",
+    "lab-server/",
+    "vendor/",
+    "docs/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "obfuscation",
+    "deobfuscation",
+    "reverse-engineering",
+    "security",
+    "ai",
+    "microdesk",
+    "win7",
+    "sandbox"
+  ],
+  "dependencies": {
+    "@babel/generator": "^7.29.0",
+    "@babel/parser": "^7.29.0",
+    "@babel/traverse": "^7.29.0",
+    "@babel/types": "^7.29.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

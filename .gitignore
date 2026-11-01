@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+
+# generated battle reports (each run writes reports/battle-report-*.md)
+reports/*.md
+
+# local AI keys / env overrides
+.env
+.env.local
+
+# OS / editor noise
+Thumbs.db
+Desktop.ini
+*.log

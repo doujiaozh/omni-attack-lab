@@ -1,0 +1,41 @@
+{
+  "name": "dsh-omni-forger",
+  "version": "1.0.0",
+  "description": "Omni-Forger: generative builder and reverse-engineering shield. Scaffold from one sentence, AST-obfuscate, single-file pack with in-memory VFS, and red-team verify.",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "bin": {
+    "forge": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js",
+    "demo": "node dist/cli.js verify --demo",
+    "pretest": "tsc -p tsconfig.json",
+    "test": "node tests/run.js"
+  },
+  "keywords": [
+    "scaffold",
+    "obfuscation",
+    "bundler",
+    "anti-reverse-engineering",
+    "vfs",
+    "codegen",
+    "win7-safe",
+    "pure-js"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.24.0",
+    "@babel/parser": "^7.24.0",
+    "@babel/traverse": "^7.24.0",
+    "@babel/types": "^7.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.4.0"
+  }
+}

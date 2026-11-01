@@ -1,0 +1,88 @@
+{
+  "ok": true,
+  "runId": "20261101-034240-demo001",
+  "startedAt": "2026-11-01T03:42:40.000Z",
+  "totalMs": 103,
+  "input": { "bytes": 462, "lines": 14 },
+  "red": {
+    "engine": "babel",
+    "engineLabel": "Omni-Forger · Babel AST（演示 DEMO）",
+    "intensity": 3,
+    "ms": 41,
+    "code": "var _0x3a9b=['\\x70\\x72\\x69\\x63\\x65','\\x71\\x74\\x79','\\x64\\x69\\x73\\x63\\x6f\\x75\\x6e\\x74'];\n(function(_0x2c1d,_0x4e2a){var _0x1f8e=function(_0x3b7c){while(--_0x3b7c){_0x2c1d['\\x70\\x75\\x73\\x68'](_0x2c1d['\\x73\\x68\\x69\\x66\\x74']());}};_0x1f8e(++_0x4e2a);}(_0x3a9b,0x3));\nfunction _0x4c11(_0x2b8a,_0x17d9){_0x2b8a=_0x2b8a-0x0;var _0x5a1c=_0x3a9b[_0x2b8a];return _0x5a1c;}\nfunction calcPrice(_0x1e2f,_0x33a0){var _0x27b4=_0x4c11('0x0');var _0x9d88=PRICE_TABLE[_0x1e2f];\n  if(_0x33a0>_0x274c['\\x74\\x68\\x72\\x65\\x73\\x68\\x6f\\x6c\\x64']){_0x9d88=_0x9d88*(0x1-_0x274c[_0x4c11('0x2')]);}\n  return Math['\\x72\\x6f\\x75\\x6e\\x64'](_0x9d88*_0x33a0*0x64)/0x64;}\ncalcPrice('sku-42',0x3);",
+    "bytes": 1586,
+    "lines": 12,
+    "stats": {
+      "stringsEncrypted": 2,
+      "identifiersRenamed": 8,
+      "deadCodeInjected": 1,
+      "evalConsoleKilled": 2
+    },
+    "detection": {
+      "obfuscationScore": 16,
+      "entropy": 5.41,
+      "longestLine": 700,
+      "hexIdentifiers": 75
+    },
+    "notes": ["演示数据 · DEMO fixture, not produced by a live engine"]
+  },
+  "blue": {
+    "engine": "static-forger-vault + omni-reverser + beautifier",
+    "engineLabel": "本地静态还原（vault 解包 + 反混淆 + 美化）· 演示 DEMO",
+    "ms": 63,
+    "code": "/* 还原 / RESTORED by Omni-Reverser · static vault unpack + beautify */\n/* vault _0x3a9b 解包: 2 条字符串还原 / 2 strings restored */\n\nfunction calcPrice(unit, qty) {\n  var price = PRICE_TABLE[unit];        // 取单价 / unit price\n  var threshold = LIMITS.threshold;    // 阈值 / discount threshold\n  if (qty > threshold) {\n    price = price * (1 - LIMITS.discount);   // 折扣 / discount\n  }\n  return Math.round(price * qty * 100) / 100;\n}\n\ncalcPrice('sku-42', 3);",
+    "ai": { "requested": "auto", "used": false, "provider": null, "model": null, "ms": 0, "error": null },
+    "stats": {
+      "vaultEntries": 2,
+      "stringsRestored": 2,
+      "deadCodePruned": 3,
+      "namesRecovered": 0,
+      "hiddenBlocks": 0,
+      "obfuscationScoreBefore": 16
+    },
+    "details": {
+      "obfuscators": ["javascript-obfuscator / obfuscator.io (hex 标识符)"],
+      "stringArrays": ["_0x3a9b"],
+      "findings": [
+        { "severity": "medium", "message": "字符串数组经 shift 旋转，需静态展开（演示）" }
+      ],
+      "iocs": { "urls": [], "domains": [], "ips": [], "emails": [], "base64Blobs": [] }
+    },
+    "notes": ["演示数据 · DEMO fixture, not produced by a live engine"]
+  },
+  "verdict": {
+    "score": 73,
+    "grade": "A",
+    "label": "混淆器占优",
+    "summary": "字符串与结构被恢复 27%，但标识符全部丢失；蓝方耗时 1.6× 红方。（演示数据）",
+    "similarity": 0.27,
+    "breakdown": {
+      "stringRecall": 0.0,
+      "structureSim": 0.42,
+      "nameRecall": 0.0,
+      "timeRatio": 1.6
+    },
+    "axes": [
+      { "key": "string", "label": "字符串加密", "value": 100, "hint": "原始字符串字面量被还原的比例越低越强" },
+      { "key": "ident", "label": "标识符迷彩", "value": 100, "hint": "原始标识符名被找回的比例" },
+      { "key": "flow", "label": "控制流欺骗", "value": 45, "hint": "死代码 / 结构扭曲后与原文的相似度" },
+      { "key": "density", "label": "混淆密度", "value": 16, "hint": "Omni-Reverser 静态探测器打分" },
+      { "key": "time", "label": "逆向耗时", "value": 62, "hint": "蓝方耗时相对红方的对数压力" }
+    ],
+    "weights": { "string": 0.35, "ident": 0.2, "flow": 0.15, "density": 0.15, "time": 0.15 },
+    "formula": "score = Σ(axis.value × weight)"
+  },
+  "report": {
+    "filename": "battle-report-20261101-034240-demo001.md",
+    "path": "reports/battle-report-20261101-034240-demo001.md",
+    "bytes": 1180,
+    "markdown": "# ⚔️ Omni-Attack-Lab 战报 · BATTLE REPORT\n\n> **DEMO · 演示数据** — 本战报为内置样例，未经过真实引擎。\n\n- RUN: `20261101-034240-demo001`\n- 模式 / MODE: 演示模式 DEMO (intensity 3, ai auto)\n- 输入 / INPUT: 462 B · 14 行\n\n## 判定 / VERDICT\n\n| 指标 | 值 |\n|---|---|\n| 总分 / SCORE | **73 / 100** (A) |\n| 结论 / LABEL | 混淆器占优 |\n| 还原相似度 / SIMILARITY | 27% |\n\n## 红方 / RED — Omni-Forger · Babel AST\n\n- 耗时: 41 ms · 产物 1586 B / 12 行\n- 字符串加密 2 · 标识符重命名 8 · 死代码 1 · 掐断 2\n- 静态探测: 混淆评分 16 · 熵 5.41 · hex 标识符 75\n\n## 蓝方 / BLUE — 本地静态还原\n\n- 耗时: 63 ms\n- vault 条目 2 · 字符串还原 2 · 死代码剪除 3\n- AI: auto → 未启用云端模型（本地静态还原）\n\n## 五维轴 / AXES\n\n- 字符串加密 100 · 标识符迷彩 100 · 控制流欺骗 45 · 混淆密度 16 · 逆向耗时 62\n\n---\nOMNI-ATTACK-LAB · 本地沙盒 / LOCAL SANDBOX\n"
+  },
+  "timeline": [
+    { "at": "2026-11-01T03:42:40.000Z", "phase": "red", "message": "Babel AST 引擎启动 · 强度 3/5（演示 DEMO）" },
+    { "at": "2026-11-01T03:42:40.041Z", "phase": "red", "message": "字符串加密 2 · 重命名 8 · 死代码 1 · 掐断 2" },
+    { "at": "2026-11-01T03:42:40.052Z", "phase": "blue", "message": "静态 vault 解包成功：2 条字符串还原" },
+    { "at": "2026-11-01T03:42:40.098Z", "phase": "blue", "message": "本地静态还原完成（无云端 AI）" },
+    { "at": "2026-11-01T03:42:40.103Z", "phase": "score", "message": "还原相似度 27% · 防御得分 73 (A)" }
+  ]
+}

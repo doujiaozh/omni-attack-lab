@@ -1,0 +1,38 @@
+{
+  "name": "dsh-omni-reverser",
+  "version": "1.0.0",
+  "description": "Omni-Reverser — universal reverse engineering engine. Magic sniffing, deep unpacking, PE/ELF/WASM parsing, JS deobfuscation, steganography detection and AI semantic analysis. Pure Node.js + TypeScript, zero native dependencies.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "omni": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "smoke": "node dist/cli.js smoke examples",
+    "start": "node dist/cli.js"
+  },
+  "keywords": [
+    "reverse-engineering",
+    "malware-analysis",
+    "steganography",
+    "deobfuscation",
+    "pe",
+    "elf",
+    "wasm",
+    "magic-numbers",
+    "forensics",
+    "security"
+  ],
+  "author": "DeepSeek Harness",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark" />
+<title>OMNI-ATTACK-LAB · 红蓝对抗沙盒 / Red vs Blue Arena</title>
+<link rel="stylesheet" href="vendor/codemirror/codemirror.css" />
+<link rel="stylesheet" href="styles.css" />
+<script>
+/* boot-time error trap (installed before app.js loads) */
+window.__errLog = [];
+window.addEventListener('error', function (e) {
+  try {
+    window.__errLog.push((e && e.message) + ' @' + (e && e.lineno));
+    if (window.__errLog.length <= 3) {
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff2e88;color:#fff;font:12px monospace;padding:4px 8px';
+      d.textContent = 'APP-ERROR: ' + (e && e.message) + ' @' + (e && e.lineno);
+      document.documentElement.appendChild(d);
+    }
+  } catch (_) {}
+});
+window.addEventListener('unhandledrejection', function (e) {
+  window.__errLog.push('REJ: ' + (e && e.reason && (e.reason.message || e.reason)));
+});
+</script>
+</head>
+<body>
+<div class="crt" aria-hidden="true"></div>
+
+<div class="app">
+
+  <!-- ============================== HEADER ============================== -->
+  <header class="hero">
+    <div class="hero-main">
+      <div class="hero-eyebrow">// LOCAL SANDBOX · NO NETWORK EGRESS · WIN7-SAFE</div>
+      <h1 class="hero-title">OMNI<span class="title-dash">-</span>ATTACK<span class="title-dash">-</span>LAB</h1>
+      <p class="hero-sub">红方混淆器 × 蓝方逆向引擎 <span class="en">/ OBFUSCATOR vs DEOBFUSCATOR</span></p>
+      <p class="hero-tag">在这个沙盒里，看看是你的混淆器硬，还是 AI 的算力强。<span class="en">In this arena, find out whether your obfuscator is tough — or the AI is stronger.</span></p>
+    </div>
+    <div class="hero-side">
+      <div class="hero-pills">
+        <span class="pill pill-boot" id="bridgePill" title="MicroDesk bridge 状态 / bridge state">
+          <span class="pill-dot"></span><span class="pill-text" id="bridgePillText">连接引擎…</span>
+        </span>
+        <span class="pill pill-ai" id="aiPill" title="蓝方 AI 状态 / blue-side AI state">
+          <span class="pill-dot"></span><span class="pill-text" id="aiPillText">AI —</span>
+        </span>
+        <span class="pill pill-clock" title="本地时间 / local time">
+          <span class="pill-text" id="clockText">--:--:--</span>
+        </span>
+      </div>
+      <div class="hero-meta" id="heroMeta">MICRODESK · LAB.NS · —</div>
+    </div>
+  </header>
+
+  <!-- ============================== DEMO BANNER ============================== -->
+  <div class="banner" id="demoBanner" hidden>
+    <span class="banner-tag">DEMO DATA</span>
+    <span class="banner-text">
+      演示模式 · 未检测到引擎桥接，以下为<strong>内置样例数据</strong>；启动 Node 服务后自动切换真实数据。
+      <span class="en">DEMO MODE — bundled fixture only. Real engine data takes over automatically once the bridge connects.</span>
+    </span>
+  </div>
+
+  <main>
+    <!-- ============================== ARENA ============================== -->
+    <section class="arena" aria-label="代码竞技场 / code arena">
+
+      <!-- LEFT: original (editable) -->
+      <div class="pane pane-input" id="paneInput">
+        <div class="pane-head">
+          <span class="role role-red" title="红方工作区 / red workspace">RED</span>
+          <div class="pane-title">
+            <span class="t-zh">原始代码</span><span class="t-en">ORIGINAL</span>
+          </div>
+          <div class="pane-tools">
+            <span class="counter" id="countInput">0 B · 0 行</span>
+            <button type="button" class="mini-btn" id="copyInput" title="复制原始代码 / copy original code">复制 COPY</button>
+          </div>
+        </div>
+        <div class="pane-body">
+          <textarea id="editorInput" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="原始代码编辑器 / original code editor"></textarea>
+        </div>
+        <div class="pane-foot">
+          <span>可编辑 / EDITABLE</span>
+          <span>Ctrl+Enter → 启动对抗</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: ciphertext + restored -->
+      <div class="pane-split">
+
+        <div class="pane pane-cipher" id="paneCipher">
+          <div class="pane-head">
+            <span class="role role-red" title="红方产物 / red output">RED</span>
+            <div class="pane-title">
+              <span class="t-zh">密文</span><span class="t-en">CIPHERTEXT</span>
+            </div>
+            <div class="pane-tools">
+              <span class="demo-chip" id="demoChipCipher" hidden>DEMO</span>
+              <span class="counter" id="countCipher">0 B · 0 行</span>
+              <button type="button" class="mini-btn" id="copyCipher" title="复制密文 / copy ciphertext">复制 COPY</button>
+              <button type="button" class="mini-btn mini-icon" id="dlCipher" title="下载密文 .js / download ciphertext">JS ↓</button>
+            </div>
+          </div>
+          <div class="pane-body">
+            <textarea id="editorCipher" spellcheck="false" readonly aria-label="密文只读视图 / ciphertext (read-only)"></textarea>
+            <div class="pane-empty" id="emptyCipher">
+              <div>
+                <div class="empty-glyph">◤ ◢</div>
+                <div class="empty-zh">等待红方点火 / AWAITING LAUNCH</div>
+                <div class="empty-en">点击「启动攻防对抗」后，这里会显示混淆产物。</div>
+              </div>
+            </div>
+          </div>
+          <div class="pane-foot">
+            <span>只读 / READ-ONLY</span>
+            <span>红方产物 / RED OUTPUT</span>
+          </div>
+        </div>
+
+        <div class="pane pane-restored" id="paneRestored">
+          <div class="pane-head">
+            <span class="role role-blue" title="蓝方产物 / blue output">BLUE</span>
+            <div class="pane-title">
+              <span class="t-zh">AI 逆向还原</span><span class="t-en">RESTORED</span>
+            </div>
+            <div class="pane-tools">
+              <span class="demo-chip" id="demoChipRestored" hidden>DEMO</span>
+              <span class="counter" id="countRestored">0 B · 0 行</span>
+              <button type="button" class="mini-btn" id="copyRestored" title="复制还原代码 / copy restored code">复制 COPY</button>
+              <button type="button" class="mini-btn mini-icon" id="dlRestored" title="下载还原代码 .js / download restored">JS ↓</button>
+            </div>
+          </div>
+          <div class="pane-body">
+            <textarea id="editorRestored" spellcheck="false" readonly aria-label="逆向还原只读视图 / restored code (read-only)"></textarea>
+            <div class="pane-empty" id="emptyRestored">
+              <div>
+                <div class="empty-glyph">◤ ◢</div>
+                <div class="empty-zh">等待蓝方逆向 / AWAITING REVERSAL</div>
+                <div class="empty-en">蓝方引擎会把密文拆回可读结构。</div>
+              </div>
+            </div>
+          </div>
+          <div class="pane-foot">
+            <span>只读 / READ-ONLY</span>
+            <span id="restoredFoot">蓝方产物 / BLUE OUTPUT</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================== CONTROL DECK ============================== -->
+    <section class="deck" aria-label="控制台 / controls">
+
+      <button type="button" class="launch" id="launchBtn" title="启动攻防对抗 / launch attack (Ctrl+Enter)">
+        <span class="launch-icon" aria-hidden="true">⚔️</span>
+        <span class="launch-label">
+          <span class="zh">启动攻防对抗</span>
+          <span class="en">LAUNCH ATTACK</span>
+        </span>
+        <span class="launch-busy">
+          <span class="launch-spinner" aria-hidden="true"></span>
+          <span class="busy-text">对抗进行中<span class="dots"><i>.</i><i>.</i><i>.</i></span></span>
+          <span class="busy-sub">FIGHTING · 请稍候</span>
+        </span>
+      </button>
+
+      <div class="ctl ctl-intensity">
+        <div class="ctl-head">
+          <span class="ctl-label">强度 <span class="en">INTENSITY</span></span>
+          <span class="ctl-value" id="intensityValue">3 / 5 · 标准</span>
+        </div>
+        <input type="range" id="intensity" min="1" max="5" step="1" value="3" aria-label="混淆强度 1 到 5 / intensity 1-5" />
+        <div class="ticks" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+      </div>
+
+      <div class="ctl ctl-samples">
+        <div class="ctl-head">
+          <span class="ctl-label">样本 <span class="en">SAMPLE</span></span>
+          <span class="ctl-hint" id="sampleNote">—</span>
+        </div>
+        <div class="select-wrap">
+          <select id="sampleSelect" aria-label="选择样本 / choose sample"></select>
+        </div>
+      </div>
+
+      <div class="ctl ctl-mini">
+        <div class="ctl-head">
+          <span class="ctl-label">AI 模式 <span class="en">AI MODE</span></span>
+          <span class="ctl-hint" id="aiHint">自动</span>
+        </div>
+        <div class="toggle" id="aiToggle" role="group" aria-label="AI 模式 / AI mode">
+          <button type="button" class="toggle-btn is-on" data-ai="auto" aria-pressed="true">自动 AUTO</button>
+          <button type="button" class="toggle-btn" data-ai="off" aria-pressed="false">仅本地 LOCAL</button>
+        </div>
+        <button type="button" class="ghost-btn" id="clearBtn" title="清空战斗日志 / clear battle log (Ctrl+Shift+C)">清空日志 / CLEAR</button>
+      </div>
+
+    </section>
+
+    <!-- ============================== SCORE + LOG ============================== -->
+    <section class="bottom">
+
+      <section class="panel score-panel" id="scorePanel" aria-label="判定 / verdict">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="zh">判定 / VERDICT</span>
+            <span class="panel-sub" id="runMeta">RUN —</span>
+          </div>
+          <div class="panel-actions">
+            <span class="demo-chip" id="demoChipScore" hidden>DEMO</span>
+            <button type="button" class="mini-btn" id="viewReportBtn" disabled title="查看战报 Markdown / view report">查看战报 VIEW</button>
+            <button type="button" class="mini-btn mini-primary" id="downloadBtn" disabled title="下载战报 Markdown / download report">⬇ 下载战报 DOWNLOAD REPORT</button>
+          </div>
+        </div>
+
+        <div class="score-grid">
+          <div class="score-left">
+            <div class="score-number">
+              <span class="score-value" id="scoreValue">--</span>
+              <span class="score-max">/100</span>
+              <span class="grade grade-empty" id="gradeBadge">?</span>
+            </div>
+            <div class="score-label" id="verdictLabel">等待对抗结果 / AWAITING RESULTS</div>
+            <p class="score-summary" id="verdictSummary">编辑左侧代码，或从样本库载入一个样本，然后点击「启动攻防对抗」。</p>
+            <div class="stats" aria-label="关键指标 / key metrics">
+              <div class="stat"><span class="stat-k">红方耗时<span class="en">RED MS</span></span><span class="stat-v" id="statRedMs">—</span></div>
+              <div class="stat"><span class="stat-k">蓝方耗时<span class="en">BLUE MS</span></span><span class="stat-v" id="statBlueMs">—</span></div>
+              <div class="stat"><span class="stat-k">还原相似度<span class="en">SIMILARITY</span></span><span class="stat-v" id="statSimilarity">—</span></div>
+              <div class="stat"><span class="stat-k">密文体积<span class="en">CIPHER BYTES</span></span><span class="stat-v" id="statBytes">—</span></div>
+              <div class="stat"><span class="stat-k">混淆评分<span class="en">OBF SCORE</span></span><span class="stat-v" id="statObf">—</span></div>
+              <div class="stat"><span class="stat-k">蓝方引擎<span class="en">BLUE ENGINE</span></span><span class="stat-v stat-v-sm" id="statEngine">—</span></div>
+            </div>
+          </div>
+
+          <div class="radar-wrap">
+            <div class="radar-head">五维对抗雷达 <span class="en">/ 5-AXIS RADAR</span></div>
+            <div class="radar" id="radar"></div>
+            <div class="radar-foot" id="radarFoot">score = Σ(axis.value × weight)</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel log-panel" aria-label="战斗日志 / battle log">
+        <div class="panel-head">
+          <div class="panel-title">
+            <span class="zh">战斗日志 / BATTLE LOG</span>
+            <span class="panel-sub" id="logCount">0 行</span>
+          </div>
+          <div class="panel-actions">
+            <span class="live-dot" id="logLive">● LIVE</span>
+          </div>
+        </div>
+        <div class="log-body" id="logBody" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <div class="log-foot">Ctrl+Shift+C 清空日志 · 保留最后 200 行 / last 200 lines</div>
+      </section>
+
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>OMNI-ATTACK-LAB · v1.0.0 · 本地沙盒 / LOCAL SANDBOX</span>
+    <span class="foot-sep">────────────</span>
+    <span id="footStatus">bridge: probing…</span>
+  </footer>
+
+</div>
+
+<!-- ============================== REPORT MODAL ============================== -->
+<div class="modal" id="reportModal" hidden role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title-wrap">
+        <span class="modal-title" id="reportTitle">战报 / BATTLE REPORT</span>
+        <span class="modal-sub" id="reportFilename">—</span>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="mini-btn" id="modalDownload">⬇ 下载 DOWNLOAD</button>
+        <button type="button" class="mini-btn mini-close" id="modalClose" aria-label="关闭 / close">✕ 关闭</button>
+      </div>
+    </div>
+    <pre class="report-pre" id="reportPre">—</pre>
+  </div>
+</div>
+
+<noscript>
+  <div class="noscript">需要启用 JavaScript 才能运行对抗界面 / JavaScript is required to run this arena.</div>
+</noscript>
+
+<script src="vendor/microdesk.sdk.js"></script>
+<script src="vendor/codemirror/codemirror.js"></script>
+<script src="vendor/codemirror/mode/javascript/javascript.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
